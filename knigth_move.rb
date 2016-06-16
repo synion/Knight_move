@@ -31,21 +31,15 @@ class Knigth
   end 
   	
   def see_available_move
-  	puts @c.sort.join(' ')
+    [[-2,1],[-2,-1],[2,1],[2,-1],[1,-2],[1,2],[-1,-2],[-1,2]].each {|x,y| move(x,y) }
+    puts @c.sort.join(' ')
+  	
   end	
 end 
 
 File.open('knigth.txt').each_line do |line|
 	a = line.chomp.split('')
     knigth = Knigth.new(a[0],a[1])
-    knigth.move(-2,1)
-    knigth.move(-2,-1)
-    knigth.move(2,-1)
-    knigth.move(2,1)
-    knigth.move(1,2)
-    knigth.move(1,-2)
-    knigth.move(-1,-2)
-    knigth.move(-1,2)
     knigth.see_available_move
 end
 
