@@ -1,47 +1,62 @@
-class Knigth
-  attr_accessor :x, :y
+class Knight < Struct.new(:position)
+  VECTORS = [[-2,1],[-2,-1],[2,1],[2,-1],[1,-2],[1,2],[-1,-2],[-1,2]]
 
-  def initialize(x,y,c=[])
- 	@x = x
- 	@y = y
- 	@c = c
-  end	
+  def to_s
+    moves.join(' ') 
+  end
 
-  def x_to_h
-  	@h = {}
-  	i = 0
-  	"a".upto "h" do |l|
-  		i += 1
-  		@h[l] = i
+  def moves
+    vectors.
+      map { |vector| coordinates + vector }.
+      select { |coords| coords.valid? }.
+      sort
+  end
+
+  private
+
+  def coordinates
+    @coordinates ||= Coordinates.new_from_position(position)
+  end
+
+  def vectors
+    @vectors ||= VECTORS.map { |vx, vy| Coordinates.new(vx, vy)}
+  end
+
+  class Coordinates < Struct.new(:x, :y)
+    LETTERS = '_abcdefgh'
+    VALID_COORDINATE = 1..8
+
+    def self.new_from_position(position)
+      self.new(LETTERS.index(position[0]), position[1].to_i)
+    end
+
+    def +(coordinates)
+      self.class.new(x + coordinates.x, y + coordinates.y)  
+    end
+
+    def valid?
+      VALID_COORDINATE.include?(x) && 
+        VALID_COORDINATE.include?(y)
+    end
+
+    def <=>(other)
+      [x, y] <=> [other.x, other.y]
+    end
+
+    def to_s
+      valid? ?
+        "#{x_position}#{y}" : 
+        "invalid coordinates"
+    end
+
+    private
+
+    def x_position
+      LETTERS[x]
     end
   end
-   
-  def move(paramX,paramY)
-  	@paramX = paramX
-  	@paramY = paramY
-  	x_to_h
-  	letter = @h.key(@h[@x].to_i + @paramX.to_i)
-  	if x_and_y?
-  	  @c << "#{letter}#{@y.to_i + @paramY.to_i}"
-  	end  
-  end
-
-  def x_and_y?
-  	(1..8).include?(@h[@x].to_i + @paramX) and (1..8).include?(@y.to_i + @paramY)
-  end 
-  	
-  def see_available_move
-    [[-2,1],[-2,-1],[2,1],[2,-1],[1,-2],[1,2],[-1,-2],[-1,2]].each {|x,y| move(x,y) }
-    puts @c.sort.join(' ')
-  	
-  end	
 end 
 
 File.open('knigth.txt').each_line do |line|
-	a = line.chomp.split('')
-    knigth = Knigth.new(a[0],a[1])
-    knigth.see_available_move
+    puts Knight.new(line.chomp)
 end
-
-
-
